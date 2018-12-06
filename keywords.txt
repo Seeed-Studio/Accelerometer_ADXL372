@@ -1,0 +1,30 @@
+  
+#######################################
+# Syntax Coloring Map For Accelerometer ADXL372
+#######################################
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ADXL372	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+power_ctrl	KEYWORD2
+timing_ctrl	KEYWORD2
+measurement_ctrl	KEYWORD2
+status	KEYWORD2
+id	KEYWORD2
+fifo_read	KEYWORD2
+samples_in_fifo	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+DATA_READY	LITERAL1
+FIFO_READY	LITERAL1
+
+
