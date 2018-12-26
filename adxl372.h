@@ -123,6 +123,8 @@
 #define FIFO_OVERRUN                    8
 
 
+#define DEFAULT_ADXL372_ADDR           0x53
+
 typedef enum {
     STANDBY_MODE = 0,
     WAKEUP_MODE,
@@ -190,9 +192,23 @@ typedef struct {
 } xyz_t; 
 
 
+typedef enum
+{
+    CHANNEL_X = 0,
+    CHANNEL_Y,
+    CHANNEL_Z,
+}channel_t;
+
+typedef enum
+{
+    INT_NUM_1 = 0,
+    INT_NUM_2,
+}IntPin_t;
+
+
 class ADXL372 {
 public:
-    ADXL372(uint8_t addr=0x53) {
+    ADXL372(uint8_t addr = DEFAULT_ADXL372_ADDR) {
         i2c_addr = addr;
     }
 
@@ -210,7 +226,7 @@ public:
     * @param: high_pass_filter  true - enable high pass filter, otherwise disable the filter
     *                           When enabled, the gravity may not be filtered out.
     */
-    int power_ctrl(operating_mode_t mode, bool low_pass_filter=true, bool high_pass_filter=false) {
+    int power_ctrl(operating_mode_t mode, bool low_pass_filter = true, bool high_pass_filter = false) {
         uint8_t value = mode;
         if (!low_pass_filter) {
             value |= 1 << 3;
@@ -314,6 +330,90 @@ public:
 
         return 0;
     }
+
+
+
+    int setActiveThreshold(channel_t chan,uint16_t thres,bool activity_axis,bool regfer_or_abs)
+    {
+        uint8_t value[2] = {0};
+        //bit [5:15] map to threshold register.
+        value[0] = thres >> 3;
+        value[1] |= (thres & 0x7)<<5;  
+        value[1] |= activity_axis ;
+        value[1] |= regfer_or_abs << 1;
+        return write(ADXL372_X_THRESH_ACT_H+chan*2,value,2);
+        
+        write(ADXL372_X_THRESH_ACT_H+chan*2,value,2);
+
+        // Serial.println(value[0],HEX);
+        // Serial.println(value[1],HEX);
+
+        // delay(300);
+        // read(ADXL372_X_THRESH_ACT_H+chan*2,&value,2);
+        // Serial.print("read data ");
+        // Serial.print(value[0],HEX);
+        // Serial.print(value[1],HEX);
+        // Serial.print("from ");
+        // Serial.println(ADXL372_X_THRESH_ACT_H+chan*2,HEX);
+    }
+
+
+    int setInactiveThreshold(channel_t chan,uint16_t thres,bool inactivity_axis,bool regfer_or_abs)
+    {
+        uint8_t value[2] = {0};
+        //bit [5:15] map to threshold register.
+        value[0] = thres >> 3;
+        value[1] |= (thres & 0x7)<<5;  
+        value[1] |= inactivity_axis ;
+        value[1] |= regfer_or_abs << 1;
+        return write(ADXL372_X_THRESH_ACT_H+chan*2,value,2);
+
+        
+    }
+
+
+    /*@param Only sustained motion for a specified time can trigger activity detection.*/
+    /*@return write result.*/
+    int setActiveTime(uint8_t count)
+    {
+        uint8_t value = 0;
+        // return write(ADXL372_TIME_ACT, count);
+        write(ADXL372_TIME_ACT, count);
+        
+    }
+
+    /*@param Only sustained motion for a specified time can trigger inactivity detection.*/
+    /*@return write result.*/
+    int setInactiveTime(uint16_t count)
+    {
+        uint8_t value[2] = {0};
+        value[0] = count >> 8;
+        value[1] = (uint8_t)count;
+        return write(ADXL372_TIME_INACT_H,value,2);
+    }
+
+
+    /**Interrupt register config. 
+     * @param chan : There are two channels:INT1 & INT2.
+     * @config: config data,more detail below:
+     * bit0:data ready        Map data ready interrupt onto INTX.
+     * bit1:fifo ready        Map FIFO_READY interrupt onto INTX.
+     * bit2:fifo full         Map FIFO_FULL interrupt onto INTX
+     * bit3:fifo overflow     Map FIFO_OVERRUN interrupt onto INTX
+     * bit4:inactive          Map inactivity interrupt onto INTX
+     * bit5:active            Map activity interrupt onto INTX.
+     * bit6:awake             Map awake interrupt onto INTX.
+     * bit7:active low        Configures INT1 for active low operation
+     * @return return write result.
+    */
+    int setIntConfig(IntPin_t chan,uint8_t config)
+    {
+        return write(ADXL372_INT1_MAP+chan,config);
+    }
+/******************************************************************************************************************/
+/******************************************************************************************************************/
+/******************************************************************************************************************/
+/******************************************************************************************************************/
 
     int read(uint8_t addr) {
         Wire.beginTransmission(i2c_addr);
