@@ -44,23 +44,24 @@ void calibration(void)
   
 	for(int i=0;i<CALI_BUF_LEN;i++)
 	{
-    while (!(acc.status() & DATA_READY)); 
-    acc.read(&xyz);
+		while (!(acc.status() & DATA_READY)); 
+		acc.read(&xyz);
 		cali_buf[0][i] = xyz.x;
 		cali_buf[1][i] = xyz.y;
-    cali_buf[2][i] = xyz.z;
+		cali_buf[2][i] = xyz.z;
 		delay(CALI_INTERVAL_TIME);
-    SERIAL.print('.');
+		SERIAL.print('.');
 	}
-  SERIAL.println('.');
-  for(int i=0;i<3;i++)
-  {
-    cali_data[i] =  deal_cali_buf(cali_buf[i]);
-    if(2 == i){
-      cali_data[i] -= 10;
-    }
-    SERIAL.println(cali_data[i]);
-  }
+	SERIAL.println('.');
+	for(int i=0;i<3;i++)
+	{
+		cali_data[i] =  deal_cali_buf(cali_buf[i]);
+		if(2 == i){
+      
+			cali_data[i] -= 10;
+		}
+		SERIAL.println(cali_data[i]);
+	}
 	SERIAL.println("Calibration OK!!");
 }
 
