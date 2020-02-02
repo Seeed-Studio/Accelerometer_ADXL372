@@ -1,28 +1,28 @@
 /*
- * adxl372.h
- * Library for Grove - 3 Axis accelerometer ADXL372
- *
- * Copyright (c) 2018 seeed technology inc.
- * The MIT License (MIT)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+    adxl372.h
+    Library for Grove - 3 Axis accelerometer ADXL372
+
+    Copyright (c) 2018 seeed technology inc.
+    The MIT License (MIT)
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
+*/
 
 
 #ifndef __ADXL372_H__
@@ -189,25 +189,23 @@ typedef struct {
     int16_t x;
     int16_t y;
     int16_t z;
-} xyz_t; 
+} xyz_t;
 
 
-typedef enum
-{
+typedef enum {
     CHANNEL_X = 0,
     CHANNEL_Y,
     CHANNEL_Z,
-}channel_t;
+} channel_t;
 
-typedef enum
-{
+typedef enum {
     INT_NUM_1 = 0,
     INT_NUM_2,
-}IntPin_t;
+} IntPin_t;
 
 
 class ADXL372 {
-public:
+  public:
     ADXL372(uint8_t addr = DEFAULT_ADXL372_ADDR) {
         i2c_addr = addr;
     }
@@ -217,14 +215,14 @@ public:
         return reset();
     }
 
-    /* 
-    * Set operating mode, low pass filter and high pass filter
-    *
-    * @param: mode  supported modes: STANDBY_MODE WAKEUP_MODE, INSTANT_ON_MODE, MEASUREMENT_MODE
-    * @param: low_pass_filter   true - enable low pass anti-aliasing filter, otherwise disable the filter
-    *                           disable it when oversampling a signal
-    * @param: high_pass_filter  true - enable high pass filter, otherwise disable the filter
-    *                           When enabled, the gravity may not be filtered out.
+    /*
+        Set operating mode, low pass filter and high pass filter
+
+        @param: mode  supported modes: STANDBY_MODE WAKEUP_MODE, INSTANT_ON_MODE, MEASUREMENT_MODE
+        @param: low_pass_filter   true - enable low pass anti-aliasing filter, otherwise disable the filter
+                                disable it when oversampling a signal
+        @param: high_pass_filter  true - enable high pass filter, otherwise disable the filter
+                                When enabled, the gravity may not be filtered out.
     */
     int power_ctrl(operating_mode_t mode, bool low_pass_filter = true, bool high_pass_filter = false) {
         uint8_t value = mode;
@@ -237,18 +235,18 @@ public:
         return write(ADXL372_POWER_CTL, value);
     }
 
-    /* 
-    * Set sample rate (aka Ouput Data Rate, ODR) and wakeup time 
-    *
-    * @param: rate  supported sample rates (Hz): RATE_400, RATE_800, RATE_1600, RATE_3200, RATE_6400
-    * @param: ms    wakeup time, supported values (ms): MS52, MS104, MS208, MS512, MS2048, MS4096, MS8192, MS24576     
+    /*
+        Set sample rate (aka Ouput Data Rate, ODR) and wakeup time
+
+        @param: rate  supported sample rates (Hz): RATE_400, RATE_800, RATE_1600, RATE_3200, RATE_6400
+        @param: ms    wakeup time, supported values (ms): MS52, MS104, MS208, MS512, MS2048, MS4096, MS8192, MS24576
     */
-    int timing_ctrl(rate_t rate, wakeup_time_t ms=MS52) {
+    int timing_ctrl(rate_t rate, wakeup_time_t ms = MS52) {
         uint8_t value = (rate << TIMING_ODR_POS) | (ms << TIMING_WUR_POS);
         return write(ADXL372_TIMING, value);
     }
 
-    int measurement_ctrl(bandwidth_t bandwidth, bool low_noise=true, uint8_t linkloop=0, bool autosleep=false) {
+    int measurement_ctrl(bandwidth_t bandwidth, bool low_noise = true, uint8_t linkloop = 0, bool autosleep = false) {
         uint8_t value = bandwidth;
         if (low_noise) {
             value |= 1 << 3;
@@ -281,14 +279,14 @@ public:
         return value;
     }
 
-    int fifo_ctrl(fifo_mode_t mode, fifo_format_t format=FIFO_XYZ, uint16_t samples_to_trigger=0x80) {
+    int fifo_ctrl(fifo_mode_t mode, fifo_format_t format = FIFO_XYZ, uint16_t samples_to_trigger = 0x80) {
         write(ADXL372_FIFO_SAMPLES, samples_to_trigger & 0xFF);
         write(ADXL372_FIFO_CTL, (samples_to_trigger & 1) | (mode << 1) | (format << 3));
         return 0;
     }
 
-    int fifo_read(void *ptr, uint16_t size) {
-        uint8_t *buf = (uint8_t *)ptr;
+    int fifo_read(void* ptr, uint16_t size) {
+        uint8_t* buf = (uint8_t*)ptr;
         while (size > 32) {
             read(ADXL372_FIFO_DATA, buf, 32);
             size -= 32;
@@ -307,8 +305,8 @@ public:
         return ((data & 0x3) << 8) | ((data >> 8) & 0xFF);
     }
 
-    xyz_t *format(void *ptr) {
-        uint8_t *buf = (uint8_t *)ptr;
+    xyz_t* format(void* ptr) {
+        uint8_t* buf = (uint8_t*)ptr;
 
         // for (uint8_t i=0; i<6; i++) {
         //     Serial.print(buf[i], HEX);
@@ -316,15 +314,15 @@ public:
         // }
         // Serial.println();
 
-        for (uint8_t i=0; i<3; i++) {
-            ((uint16_t *)buf)[i] = (buf[2*i] << 8) | buf[2*i+1];
-            ((int16_t *)buf)[i] = ((int16_t *)buf)[i] >> 4;
+        for (uint8_t i = 0; i < 3; i++) {
+            ((uint16_t*)buf)[i] = (buf[2 * i] << 8) | buf[2 * i + 1];
+            ((int16_t*)buf)[i] = ((int16_t*)buf)[i] >> 4;
         }
 
-        return (xyz_t *)buf;
+        return (xyz_t*)buf;
     }
 
-    int read(xyz_t *xyz) {
+    int read(xyz_t* xyz) {
         read(ADXL372_X_DATA_H, xyz, 6);
         format(xyz);
 
@@ -333,17 +331,16 @@ public:
 
 
 
-    int setActiveThreshold(channel_t chan,uint16_t thres,bool activity_axis,bool regfer_or_abs)
-    {
+    int setActiveThreshold(channel_t chan, uint16_t thres, bool activity_axis, bool regfer_or_abs) {
         uint8_t value[2] = {0};
         //bit [5:15] map to threshold register.
         value[0] = thres >> 3;
-        value[1] |= (thres & 0x7)<<5;  
+        value[1] |= (thres & 0x7) << 5;
         value[1] |= activity_axis ;
         value[1] |= regfer_or_abs << 1;
-        return write(ADXL372_X_THRESH_ACT_H+chan*2,value,2);
-        
-        write(ADXL372_X_THRESH_ACT_H+chan*2,value,2);
+        return write(ADXL372_X_THRESH_ACT_H + chan * 2, value, 2);
+
+        write(ADXL372_X_THRESH_ACT_H + chan * 2, value, 2);
 
         // Serial.println(value[0],HEX);
         // Serial.println(value[1],HEX);
@@ -358,62 +355,58 @@ public:
     }
 
 
-    int setInactiveThreshold(channel_t chan,uint16_t thres,bool inactivity_axis,bool regfer_or_abs)
-    {
+    int setInactiveThreshold(channel_t chan, uint16_t thres, bool inactivity_axis, bool regfer_or_abs) {
         uint8_t value[2] = {0};
         //bit [5:15] map to threshold register.
         value[0] = thres >> 3;
-        value[1] |= (thres & 0x7)<<5;  
+        value[1] |= (thres & 0x7) << 5;
         value[1] |= inactivity_axis ;
         value[1] |= regfer_or_abs << 1;
-        return write(ADXL372_X_THRESH_ACT_H+chan*2,value,2);
+        return write(ADXL372_X_THRESH_ACT_H + chan * 2, value, 2);
 
-        
+
     }
 
 
     /*@param Only sustained motion for a specified time can trigger activity detection.*/
     /*@return write result.*/
-    int setActiveTime(uint8_t count)
-    {
+    int setActiveTime(uint8_t count) {
         uint8_t value = 0;
         // return write(ADXL372_TIME_ACT, count);
         write(ADXL372_TIME_ACT, count);
-        
+
     }
 
     /*@param Only sustained motion for a specified time can trigger inactivity detection.*/
     /*@return write result.*/
-    int setInactiveTime(uint16_t count)
-    {
+    int setInactiveTime(uint16_t count) {
         uint8_t value[2] = {0};
         value[0] = count >> 8;
         value[1] = (uint8_t)count;
-        return write(ADXL372_TIME_INACT_H,value,2);
+        return write(ADXL372_TIME_INACT_H, value, 2);
     }
 
 
-    /**Interrupt register config. 
-     * @param chan : There are two channels:INT1 & INT2.
-     * @config: config data,more detail below:
-     * bit0:data ready        Map data ready interrupt onto INTX.
-     * bit1:fifo ready        Map FIFO_READY interrupt onto INTX.
-     * bit2:fifo full         Map FIFO_FULL interrupt onto INTX
-     * bit3:fifo overflow     Map FIFO_OVERRUN interrupt onto INTX
-     * bit4:inactive          Map inactivity interrupt onto INTX
-     * bit5:active            Map activity interrupt onto INTX.
-     * bit6:awake             Map awake interrupt onto INTX.
-     * bit7:active low        Configures INT1 for active low operation
-     * @return return write result.
+    /** Interrupt register config.
+        @param chan : There are two channels:INT1 & INT2.
+        @config: config data,more detail below:
+        bit0:data ready        Map data ready interrupt onto INTX.
+        bit1:fifo ready        Map FIFO_READY interrupt onto INTX.
+        bit2:fifo full         Map FIFO_FULL interrupt onto INTX
+        bit3:fifo overflow     Map FIFO_OVERRUN interrupt onto INTX
+        bit4:inactive          Map inactivity interrupt onto INTX
+        bit5:active            Map activity interrupt onto INTX.
+        bit6:awake             Map awake interrupt onto INTX.
+        bit7:active low        Configures INT1 for active low operation
+        @return return write result.
     */
-    int setIntConfig(IntPin_t chan,uint8_t config)
-    {
-        return write(ADXL372_INT1_MAP+chan,config);
+    int setIntConfig(IntPin_t chan, uint8_t config) {
+        return write(ADXL372_INT1_MAP + chan, config);
     }
-/******************************************************************************************************************/
-/******************************************************************************************************************/
-/******************************************************************************************************************/
-/******************************************************************************************************************/
+    /******************************************************************************************************************/
+    /******************************************************************************************************************/
+    /******************************************************************************************************************/
+    /******************************************************************************************************************/
 
     int read(uint8_t addr) {
         Wire.beginTransmission(i2c_addr);
@@ -422,26 +415,26 @@ public:
         Wire.requestFrom(i2c_addr, (uint8_t)1);
 
         while (!Wire.available()) {
-            
+
         }
-        
+
         return Wire.read();
     }
 
-    int read(uint8_t addr, void *ptr, uint8_t size) {
-        uint8_t *buf = (uint8_t *)ptr;
+    int read(uint8_t addr, void* ptr, uint8_t size) {
+        uint8_t* buf = (uint8_t*)ptr;
         Wire.beginTransmission(i2c_addr);
         Wire.write(addr);
         Wire.endTransmission(false);
         Wire.requestFrom(i2c_addr, size);
 
-        for (uint8_t i=0; i<size; i++) {
+        for (uint8_t i = 0; i < size; i++) {
             while (!Wire.available()) {
-            
+
             }
             buf[i] = Wire.read();
         }
-        
+
         return size;
     }
 
@@ -454,11 +447,11 @@ public:
         return 0;
     }
 
-    int write(uint8_t addr, void *ptr, uint8_t size) {
-        uint8_t *buf = (uint8_t *)ptr;
+    int write(uint8_t addr, void* ptr, uint8_t size) {
+        uint8_t* buf = (uint8_t*)ptr;
         Wire.beginTransmission(i2c_addr);
         Wire.write(addr);
-        for (uint8_t i=0; i<size; i++) {
+        for (uint8_t i = 0; i < size; i++) {
             Wire.write(buf[i]);
         }
         Wire.endTransmission();
@@ -466,7 +459,7 @@ public:
         return size;
     }
 
-private:
+  private:
     uint8_t i2c_addr;
 };
 
