@@ -1,4 +1,4 @@
-## Accelerometer_ADXL372
+## Accelerometer_ADXL372  [![Build Status](https://travis-ci.com/Seeed-Studio/Accelerometer_ADXL372.svg?branch=master)](https://travis-ci.com/Seeed-Studio/Accelerometer_ADXL372)
 
 
 This is an ultralow power MEMS accelerometer providing you at 100mg/LSB resolution and large ±200g measurement range. It's base on ADXL372.
