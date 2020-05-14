@@ -4,23 +4,31 @@
 
 #define BUFFER_SIZE   (160*6)
 
+#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
+    #define SERIAL Serial
+    #define SYS_VOL   3.3
+#else
+    #define SERIAL Serial
+    #define SYS_VOL   5
+#endif
+
 ADXL372 acc;
 xyz_t xyz;
 
 uint8_t buffer[BUFFER_SIZE] = {0,};
 
 void setup() {
-    Serial.begin(115200);
+    SERIAL.begin(115200);
 
     acc.begin();
 
-    Serial.println(acc.id(), HEX);
+    SERIAL.println(acc.id(), HEX);
     acc.timing_ctrl(RATE_400);
     acc.measurement_ctrl(BW_200, true);
     acc.fifo_ctrl(STREAMED, FIFO_XYZ);
     acc.power_ctrl(MEASUREMENT_MODE);
 
-    Serial.println("unit 100 mg");
+    SERIAL.println("unit 100 mg");
 }
 
 void loop() {
@@ -34,13 +42,13 @@ void loop() {
         for (uint16_t i = 0; i < samples; i += 6) {
             // convert raw data
             xyz_t* xyz = acc.format(buffer + i);
-            Serial.print(samples);
-            Serial.print('\t');
-            Serial.print(xyz->x);
-            Serial.print('\t');
-            Serial.print(xyz->y);
-            Serial.print('\t');
-            Serial.println(xyz->z);
+            SERIAL.print(samples);
+            SERIAL.print('\t');
+            SERIAL.print(xyz->x);
+            SERIAL.print('\t');
+            SERIAL.print(xyz->y);
+            SERIAL.print('\t');
+            SERIAL.println(xyz->z);
         }
 
     }

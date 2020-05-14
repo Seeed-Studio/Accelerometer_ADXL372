@@ -3,7 +3,7 @@
 #include "adxl372.h"
 
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SERIALUSB
+    #define SERIAL Serial
     #define SYS_VOL   3.3
 #else
     #define SERIAL Serial
