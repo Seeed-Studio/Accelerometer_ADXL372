@@ -374,7 +374,7 @@ class ADXL372 {
         uint8_t value = 0;
         // return write(ADXL372_TIME_ACT, count);
         write(ADXL372_TIME_ACT, count);
-
+        return 0;
     }
 
     /*@param Only sustained motion for a specified time can trigger inactivity detection.*/
